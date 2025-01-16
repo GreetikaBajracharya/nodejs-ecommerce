@@ -1,4 +1,5 @@
 import { redis } from "../lib/redis.js";
+import cloudinary from "../lib/cloudinary.js";
 import Product from "../models/product.model.js";
 
 export const getAllProducts = async (req,res) => {
@@ -32,6 +33,31 @@ export const getFeaturedProducts = async (req,res) => {
     } catch (error) {
         console.log("Error in get featured products controller",error);
         res.status(500).json({message: "Internal server error"});
+    }
+};
+
+export const createProduct = async (req,res) => {
+    try {
+        const {name, price, description, category, image} = req.body;
+
+        let cloudinaryResponse = null;
+
+        if(image){
+            cloudinaryResponse = await cloudinary.uploader.upload(image, {folder:"products"});
+        }
+
+        const product = await Product.create({
+            name,
+            price,
+            description,
+            category,
+            image: cloudinaryResponse?.secure_url ? cloudinaryResponse.secure_url : "",
+        }); 
+
+        res.status(201).json(product);
+    } catch (error) {
+        console.log("Error in create product controller",error);
+        res.status(500).json({message: "Product creation failed"});
     }
 };
 
