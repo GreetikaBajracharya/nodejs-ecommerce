@@ -137,4 +137,11 @@ export const refreshToken = async (req,res) => {
     } 
 };
 
-
+export const getProfile = async (req,res) => {
+    try {
+          res.json(req.user);
+    } catch (error) {
+         console.log("Error in get profile controller",error);
+         res.status(500).json({message: "Internal server error"});
+    }
+};
